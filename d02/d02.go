@@ -45,11 +45,12 @@ func d02_1(data []Move) int {
 	horizontal := 0
 	for i := 0; i < len(data); i++ {
 		mv := data[i]
-		if mv.direction == "forward" {
+		switch mv.direction {
+		case "forward":
 			horizontal += mv.far
-		} else if mv.direction == "down" {
+		case "down":
 			depth += mv.far
-		} else if mv.direction == "up" {
+		case "up":
 			depth -= mv.far
 		}
 	}
@@ -63,12 +64,13 @@ func d02_2(data []Move) int {
 	aim := 0
 	for i := 0; i < len(data); i++ {
 		mv := data[i]
-		if mv.direction == "forward" {
+		switch mv.direction {
+		case "forward":
 			horizontal += mv.far
 			depth += aim * mv.far
-		} else if mv.direction == "down" {
+		case "down":
 			aim += mv.far
-		} else if mv.direction == "up" {
+		case "up":
 			aim -= mv.far
 		}
 	}

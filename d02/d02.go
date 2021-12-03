@@ -1,6 +1,7 @@
 package main
 
 import (
+	"AoC2021/aoc_fun"
 	"bufio"
 	"log"
 	"os"
@@ -41,6 +42,7 @@ func read_data() []Move {
 }
 
 func d02_1(data []Move) int {
+	defer aoc_fun.Track(aoc_fun.Runningtime())
 	depth := 0
 	horizontal := 0
 	for _, mv := range data {
@@ -58,6 +60,7 @@ func d02_1(data []Move) int {
 }
 
 func d02_2(data []Move) int {
+	defer aoc_fun.Track(aoc_fun.Runningtime())
 	depth := 0
 	horizontal := 0
 	aim := 0

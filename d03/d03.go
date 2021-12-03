@@ -1,6 +1,7 @@
 package main
 
 import (
+	"AoC2021/aoc_fun"
 	"bufio"
 	"log"
 	"os"
@@ -43,6 +44,7 @@ func read_data() []Record {
 }
 
 func d03_1(data []Record) int {
+	defer aoc_fun.Track(aoc_fun.Runningtime())
 	var values []int
 	for _, bit := range data {
 		for i, char := range bit.power {
@@ -87,6 +89,7 @@ func d03_1(data []Record) int {
 }
 
 func d03_2(data []Record) int {
+	defer aoc_fun.Track(aoc_fun.Runningtime())
 	oxygen_idxs := make(map[int]bool)
 	scrubber_idxs := make(map[int]bool)
 

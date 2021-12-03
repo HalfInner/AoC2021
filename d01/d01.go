@@ -1,6 +1,7 @@
 package main
 
 import (
+	"AoC2021/aoc_fun"
 	"bufio"
 	"log"
 	"os"
@@ -29,6 +30,7 @@ func read_data() []int {
 }
 
 func d01_1(data []int) int {
+	defer aoc_fun.Track(aoc_fun.Runningtime())
 	increases := 0
 	for i := 0; i < len(data)-1; i++ {
 		if data[i] < data[i+1] {
@@ -40,6 +42,7 @@ func d01_1(data []int) int {
 }
 
 func d01_2(data []int) int {
+	defer aoc_fun.Track(aoc_fun.Runningtime())
 	increases := 0
 	for i := 0; i < len(data)-3; i++ {
 		curr_sum := data[i] + data[i+1] + data[i+2]

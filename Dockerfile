@@ -2,12 +2,17 @@ FROM golang:1.15-alpine
 
 WORKDIR /app
 
-COPY . .
+COPY aoc_fun/ aoc_fun/
+COPY go.mod go.mod
+COPY start.sh start.sh
 
-# Of course faster is to have one command with following "&&",
-# but I prefer to have fast re-build of the last puzzle
+COPY d01/ d01/
 RUN go install d01/d01.go
+
+COPY d02/ d02/
 RUN go install d02/d02.go
+
+COPY d03/ d03/
 RUN go install d03/d03.go
 
 CMD ["./start.sh"]

@@ -7,7 +7,10 @@ go run d01/d01.go d01/input.txt
 ```
 
 ## Docker
-Not ready
+```sh
+docker build -t aoc_2021:latest .
+docker container run aoc_2021:latest
+```
 
 
 ## License

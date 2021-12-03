@@ -13,7 +13,7 @@ type Move struct {
 	far       int
 }
 
-func ParseMove(line string) Move {
+func parse_move(line string) Move {
 	v := strings.Split(line, " ")
 	far, _ := strconv.Atoi(v[1])
 	return Move{v[0], far}
@@ -29,7 +29,7 @@ func read_data() []Move {
 	scanner := bufio.NewScanner(file)
 	var data []Move
 	for scanner.Scan() {
-		mv := ParseMove(scanner.Text())
+		mv := parse_move(scanner.Text())
 		data = append(data, mv)
 	}
 
@@ -43,8 +43,7 @@ func read_data() []Move {
 func d02_1(data []Move) int {
 	depth := 0
 	horizontal := 0
-	for i := 0; i < len(data); i++ {
-		mv := data[i]
+	for _, mv := range data {
 		switch mv.direction {
 		case "forward":
 			horizontal += mv.far
@@ -62,8 +61,7 @@ func d02_2(data []Move) int {
 	depth := 0
 	horizontal := 0
 	aim := 0
-	for i := 0; i < len(data); i++ {
-		mv := data[i]
+	for _, mv := range data {
 		switch mv.direction {
 		case "forward":
 			horizontal += mv.far

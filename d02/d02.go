@@ -21,7 +21,12 @@ func parse_move(line string) Move {
 }
 
 func read_data() []Move {
-	file, err := os.Open(os.Args[1])
+	input_file_name := aoc_fun.GetDefaultInputFilePath()
+	if len(os.Args) == 2 {
+		input_file_name = os.Args[1]
+	}
+
+	file, err := os.Open(input_file_name)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,8 +85,9 @@ func d02_2(data []Move) int {
 }
 
 func main() {
-	data := read_data()
+	defer aoc_fun.Unprofile(aoc_fun.ProfileCPU())
 
+	data := read_data()
 	log.Printf("01: %d", d02_1(data))
 	log.Printf("02: %d", d02_2(data))
 }

@@ -23,7 +23,12 @@ func parse_move(line string) Record {
 }
 
 func read_data() []Record {
-	file, err := os.Open(os.Args[1])
+	input_file_name := aoc_fun.GetDefaultInputFilePath()
+	if len(os.Args) == 2 {
+		input_file_name = os.Args[1]
+	}
+
+	file, err := os.Open(input_file_name)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -156,8 +161,9 @@ func d03_2(data []Record) int {
 }
 
 func main() {
-	data := read_data()
+	defer aoc_fun.Unprofile(aoc_fun.ProfileCPU())
 
+	data := read_data()
 	log.Printf("01: %d", d03_1(data))
 	log.Printf("02: %d", d03_2(data))
 }

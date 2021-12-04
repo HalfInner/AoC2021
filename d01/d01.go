@@ -9,7 +9,12 @@ import (
 )
 
 func read_data() []int {
-	file, err := os.Open(os.Args[1])
+	input_file_name := aoc_fun.GetDefaultInputFilePath()
+	if len(os.Args) == 2 {
+		input_file_name = os.Args[1]
+	}
+
+	file, err := os.Open(input_file_name)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,8 +61,9 @@ func d01_2(data []int) int {
 }
 
 func main() {
-	data := read_data()
+	defer aoc_fun.Unprofile(aoc_fun.ProfileCPU())
 
+	data := read_data()
 	log.Printf("01: %d", d01_1(data))
 	log.Printf("02: %d", d01_2(data))
 }

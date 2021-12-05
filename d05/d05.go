@@ -2,10 +2,10 @@ package main
 
 import (
 	"AoC2021/aoc_fun"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -21,17 +21,8 @@ type Data struct {
 }
 
 func parse(line string, data *Data) {
-	nearby_line_str := strings.Split(line, " -> ")
-	if len(nearby_line_str) != 2 {
-		return
-	}
-	from_str := strings.Split(nearby_line_str[0], ",")
-	to_str := strings.Split(nearby_line_str[1], ",")
-
-	from_x, _ := strconv.ParseUint(from_str[0], 10, 64)
-	from_y, _ := strconv.ParseUint(from_str[1], 10, 64)
-	to_x, _ := strconv.ParseUint(to_str[0], 10, 64)
-	to_y, _ := strconv.ParseUint(to_str[1], 10, 64)
+	var from_x, from_y, to_x, to_y int
+	fmt.Sscanf(line, "%d,%d -> %d,%d", &from_x, &from_y, &to_x, &to_y)
 
 	data.records = append(data.records, Record{int(from_x), int(from_y), int(to_x), int(to_y)})
 }

@@ -58,9 +58,9 @@ func read_data() Data {
 	return data
 }
 
-func count_points(data Data, check_diagonals bool) int {
+func count_points(data Data, check_diagonals bool, use_array bool) int {
 	hash_key := func(x int, y int) int {
-		return int(int64(x)<<32 | int64(y))
+		return int(x<<32 | y)
 	}
 	dir := func(a, b int) int {
 		if a == b {
@@ -71,14 +71,34 @@ func count_points(data Data, check_diagonals bool) int {
 		return -1
 	}
 
-	points := make(map[int]int)
+	points_hash := make(map[int]int)
+	points_array := make([][]int, 1000)
+	for idx := range points_array {
+		points_array[idx] = make([]int, 1000)
+	}
+
+	sum := 0
 	for _, rec := range data.records {
 		if !check_diagonals && !(rec.from_x == rec.to_x || rec.from_y == rec.to_y) {
 			continue
 		}
 		x1, y1, x2, y2 := rec.from_x, rec.from_y, rec.to_x, rec.to_y
 		for {
-			points[hash_key(x1, y1)]++
+			if use_array {
+				points_array[x1][y1]++
+				if points_array[x1][y1] == 2 {
+					sum++
+				}
+			} else {
+				hash := hash_key(x1, y1)
+				if el := points_hash[hash]; el < 2 {
+					points_hash[hash] = el + 1
+					if el+1 == 2 {
+						sum++
+					}
+				}
+			}
+
 			if x1 == x2 && y1 == y2 {
 				break
 			}
@@ -88,24 +108,17 @@ func count_points(data Data, check_diagonals bool) int {
 		}
 	}
 
-	sum := 0
-	for _, val := range points {
-		if val >= 2 {
-			sum += 1
-		}
-	}
-
 	return sum
 }
 
 func d05_1(data Data) int {
 	defer aoc_fun.Track(aoc_fun.Runningtime())
-	return count_points(data, false)
+	return count_points(data, false, true)
 }
 
 func d05_2(data Data) int {
 	defer aoc_fun.Track(aoc_fun.Runningtime())
-	return count_points(data, true)
+	return count_points(data, true, true)
 }
 
 func main() {

@@ -58,43 +58,33 @@ func read_data() Data {
 	return data
 }
 
-func d05_1(data Data) int {
-	defer aoc_fun.Track(aoc_fun.Runningtime())
-	is_hor_ver := func(record Record) bool {
-		return record.from_x == record.to_x || record.from_y == record.to_y
-	}
-
+func count_points(data Data, check_diagonals bool) int {
 	hash_key := func(x int, y int) int {
 		return int(int64(x)<<32 | int64(y))
 	}
+	dir := func(a, b int) int {
+		if a == b {
+			return 0
+		} else if a < b {
+			return 1
+		}
+		return -1
+	}
 
 	points := make(map[int]int)
-
 	for _, rec := range data.records {
-		if !is_hor_ver(rec) {
+		if !check_diagonals && !(rec.from_x == rec.to_x || rec.from_y == rec.to_y) {
 			continue
 		}
-		x1 := rec.from_x
-		y1 := rec.from_y
-		x2 := rec.to_x
-		y2 := rec.to_y
+		x1, y1, x2, y2 := rec.from_x, rec.from_y, rec.to_x, rec.to_y
 		for {
 			points[hash_key(x1, y1)]++
-
 			if x1 == x2 && y1 == y2 {
 				break
 			}
 
-			if x1 < x2 {
-				x1 += 1
-			} else if x1 > x2 {
-				x1 -= 1
-			}
-			if y1 < y2 {
-				y1 += 1
-			} else if y1 > y2 {
-				y1 -= 1
-			}
+			x1 += dir(x1, x2)
+			y1 += dir(y1, y2)
 		}
 	}
 
@@ -104,50 +94,18 @@ func d05_1(data Data) int {
 			sum += 1
 		}
 	}
+
 	return sum
+}
+
+func d05_1(data Data) int {
+	defer aoc_fun.Track(aoc_fun.Runningtime())
+	return count_points(data, false)
 }
 
 func d05_2(data Data) int {
 	defer aoc_fun.Track(aoc_fun.Runningtime())
-	hash_key := func(x int, y int) int {
-		return int(int64(x)<<32 | int64(y))
-	}
-
-	points := make(map[int]int)
-
-	for _, rec := range data.records {
-		x1 := rec.from_x
-		y1 := rec.from_y
-		x2 := rec.to_x
-		y2 := rec.to_y
-		for {
-			points[hash_key(x1, y1)]++
-
-			if x1 == x2 && y1 == y2 {
-				break
-			}
-
-			if x1 < x2 {
-				x1 += 1
-			} else if x1 > x2 {
-				x1 -= 1
-			}
-			if y1 < y2 {
-				y1 += 1
-			} else if y1 > y2 {
-				y1 -= 1
-			}
-		}
-	}
-
-	sum := 0
-	for _, val := range points {
-		if val >= 2 {
-			sum += 1
-		}
-	}
-
-	return sum
+	return count_points(data, true)
 }
 
 func main() {

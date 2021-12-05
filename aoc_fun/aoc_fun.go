@@ -32,6 +32,7 @@ func ProfileCPU() *os.File {
 	if !do_profile {
 		return nil
 	}
+	log.Println("*** PROFILING ENABLED ***")
 	cpu_profile_file_handler, err := os.Create("cpu.prof")
 	if err != nil {
 		log.Fatal("could not create CPU profile: ", err)

@@ -18,4 +18,7 @@ RUN go install d03/d03.go
 COPY d04/ d04/
 RUN go install d04/d04.go
 
+COPY d05/ d05/
+RUN go install d05/d05.go
+
 CMD ["./start.sh"]

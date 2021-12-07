@@ -10,6 +10,13 @@ import (
 	"time"
 )
 
+func Abs(a int) int {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
+
 func Runningtime() time.Time {
 	return time.Now()
 }

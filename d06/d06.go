@@ -70,10 +70,8 @@ func d06_2(data Data) int {
 	for day := 0; day < days; day++ {
 		last := 0
 		p_n := len(phases)
+		last = phases[0]
 		for idx := 0; idx < p_n-1; idx++ {
-			if idx == 0 {
-				last = phases[idx]
-			}
 			phases[idx] = phases[idx+1]
 		}
 		phases[p_n-1] = last

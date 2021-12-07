@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine
+FROM golang:1.17-alpine
 
 WORKDIR /app
 
@@ -23,5 +23,8 @@ RUN go install d05/d05.go
 
 COPY d06/ d06/
 RUN go install d06/d06.go
+
+COPY d07/ d07/
+RUN go install d07/d07.go
 
 CMD ["./start.sh"]

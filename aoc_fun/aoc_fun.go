@@ -6,6 +6,7 @@ import (
 	"path"
 	"runtime"
 	"runtime/pprof"
+	"sort"
 	"strings"
 	"time"
 )
@@ -30,6 +31,26 @@ func GetDefaultInputFilePath() string {
 	_, filename, _, _ := runtime.Caller(2)
 	filename = string(path.Dir(filename)) + "/input.txt"
 	return filename
+}
+
+func SortString(input string) string {
+	runeArray := []rune(input)
+	sort.Sort(sortRuneString(runeArray))
+	return string(runeArray)
+}
+
+type sortRuneString []rune
+
+func (s sortRuneString) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s sortRuneString) Less(i, j int) bool {
+	return s[i] < s[j]
+}
+
+func (s sortRuneString) Len() int {
+	return len(s)
 }
 
 func ProfileCPU() *os.File {

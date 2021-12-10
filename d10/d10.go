@@ -2,7 +2,6 @@ package main
 
 import (
 	"AoC2021/aoc_fun"
-	"container/list"
 	"io/ioutil"
 	"log"
 	"os"
@@ -35,6 +34,41 @@ func read_data() Data {
 	return data
 }
 
+type Stack struct {
+	capacity int
+	vec      []rune
+}
+
+func (s *Stack) Size() int {
+	return s.capacity
+}
+func (s *Stack) Empty() {
+	s.capacity = 0
+}
+
+func (s *Stack) Push(value rune) {
+	if s.capacity == len(s.vec) {
+		s.vec = append(s.vec, value)
+	} else {
+		s.vec[s.capacity] = value
+	}
+	s.capacity++
+}
+
+func (s *Stack) Pop() {
+	if s.capacity == 0 {
+		log.Panic("Trying to pop from empty stack")
+	}
+	s.capacity--
+}
+
+func (s *Stack) Top() rune {
+	if s.capacity == 0 {
+		log.Panic("Trying to read from empty stack")
+	}
+	return s.vec[s.capacity-1]
+}
+
 func d10_1(data Data) int {
 	defer aoc_fun.Track(aoc_fun.Runningtime())
 
@@ -54,33 +88,50 @@ func d10_1(data Data) int {
 		}
 	}
 
-	open_bracets := map[rune]rune{
-		'(': ')',
-		'<': '>',
-		'[': ']',
-		'{': '}',
+	open_bracets := func(r rune) rune {
+		switch r {
+		case '(':
+			return ')'
+		case '<':
+			return '>'
+		case '[':
+			return ']'
+		case '{':
+			return '}'
+		default:
+			return 'X'
+		}
 	}
 
-	close_bracets := map[rune]rune{
-		')': '(',
-		'>': '<',
-		']': '[',
-		'}': '{',
+	close_bracets := func(r rune) rune {
+		switch r {
+		case ')':
+			return '('
+		case '>':
+			return '<'
+		case ']':
+			return '['
+		case '}':
+			return '{'
+		default:
+			return 'X'
+		}
 	}
 
-	stack := list.New()
+	var stack Stack
 	sum := 0
 	for _, line := range data.states {
+		stack.Empty()
 		for _, b := range line {
-			if val, ok := open_bracets[b]; ok {
-				stack.PushFront(val)
+			if val := open_bracets(b); val != 'X' {
+				stack.Push(val)
 			}
-			if val, ok := close_bracets[b]; ok {
-				front := stack.Front()
-				if front.Value.(rune) == open_bracets[val] {
-					stack.Remove(front)
+			if val := close_bracets(b); val != 'X' {
+				front := stack.Top()
+				if front == open_bracets(val) {
+					stack.Pop()
 				} else {
-					sum += point_per_bracket(open_bracets[val])
+					sum += point_per_bracket(open_bracets(val))
 					break
 				}
 			}
@@ -108,32 +159,48 @@ func d10_2(data Data) int {
 		}
 	}
 
-	open_bracets := map[rune]rune{
-		'(': ')',
-		'<': '>',
-		'[': ']',
-		'{': '}',
+	open_bracets := func(r rune) rune {
+		switch r {
+		case '(':
+			return ')'
+		case '<':
+			return '>'
+		case '[':
+			return ']'
+		case '{':
+			return '}'
+		default:
+			return 'X'
+		}
 	}
 
-	close_bracets := map[rune]rune{
-		')': '(',
-		'>': '<',
-		']': '[',
-		'}': '{',
+	close_bracets := func(r rune) rune {
+		switch r {
+		case ')':
+			return '('
+		case '>':
+			return '<'
+		case ']':
+			return '['
+		case '}':
+			return '{'
+		default:
+			return 'X'
+		}
 	}
 
 	var sums []int
+	var stack Stack
 	for _, line := range data.states {
-		stack := list.New()
+		stack.Empty()
 		to_skip := false
 		for _, b := range line {
-			if val, ok := open_bracets[b]; ok {
-				stack.PushFront(val)
+			if val := open_bracets(b); val != 'X' {
+				stack.Push(val)
 			}
-			if val, ok := close_bracets[b]; ok {
-				front := stack.Front()
-				if front.Value.(rune) == open_bracets[val] {
-					stack.Remove(front)
+			if val := close_bracets(b); val != 'X' {
+				if stack.Top() == open_bracets(val) {
+					stack.Pop()
 				} else {
 					to_skip = true
 					break
@@ -145,8 +212,8 @@ func d10_2(data Data) int {
 		}
 
 		partial_sum := 0
-		for last := stack.Front(); last != nil; last = last.Next() {
-			partial_sum = partial_sum*5 + point_per_bracket(last.Value.(rune))
+		for idx := 0; idx < stack.capacity; idx++ {
+			partial_sum = partial_sum*5 + point_per_bracket(stack.vec[stack.capacity-idx-1])
 		}
 		if partial_sum > 0 {
 			sums = append(sums, partial_sum)

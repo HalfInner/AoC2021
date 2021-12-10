@@ -8,43 +8,6 @@ import (
 	"strings"
 )
 
-// 0:      1:U     2:      3:      4:U
-//  aaaa    ....    aaaa    aaaa    ....
-// b    c  .    c  .    c  .    c  b    c
-// b    c  .    c  .    c  .    c  b    c
-//  ....    ....    dddd    dddd    dddd
-// e    f  .    f  e    .  .    f  .    f
-// e    f  .    f  e    .  .    f  .    f
-//  gggg    ....    gggg    gggg    ....
-
-// 5:      6:      7:U     8:U     9:
-//  aaaa    aaaa    aaaa    aaaa    aaaa
-// b    .  b    .  .    c  b    c  b    c
-// b    .  b    .  .    c  b    c  b    c
-//  dddd    dddd    ....    dddd    dddd
-// .    f  e    f  .    f  e    f  .    f
-// .    f  e    f  .    f  e    f  .    f
-//  gggg    gggg    ....    gggg    gggg
-
-// Unique: 1,4,7,8
-// 5 	 : 2,3,5
-// 6	 : 0,6,9
-
-// Per Line:
-
-// 0 -> 6
-// 1 -> 2  // unique
-// 2 -> 5
-// 3 -> 5
-// 4 -> 4  // unique
-// 5 -> 5
-// 6 -> 6
-// 7 -> 3  // unique
-// 8 -> 7  // unique
-// 9 -> 6
-//
-// be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
-
 type Record struct {
 	signal []string
 	expect []string
@@ -64,10 +27,6 @@ func parse(line string, data *Data) {
 
 	data.states = append(data.states, Record{signal, expect})
 }
-
-// a => b
-// b
-// c
 
 func read_data() Data {
 	input_file_name := aoc_fun.GetDefaultInputFilePath()
@@ -201,9 +160,7 @@ func d08_2(data Data) int {
 			log.Panic("Wrong length for one")
 		}
 		for _, r := range signal {
-			switch r {
-			case a, b, c, d, e, f:
-			default:
+			if r != a && r != b && r != c && r != d && r != e && r != f {
 				return r
 			}
 		}

@@ -30,4 +30,10 @@ RUN go install d07/d07.go
 COPY d08/ d08/
 RUN go install d08/d08.go
 
+COPY d09/ d09/
+RUN go install d09/d09.go
+
+COPY d10/ d10/
+RUN go install d10/d10.go
+
 CMD ["./start.sh"]

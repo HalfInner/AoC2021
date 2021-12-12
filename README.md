@@ -1,5 +1,15 @@
 # AoC2021
-Solutions of AoC2021. Written in Go language.
+Solutions of the Advent of Code 2021. Written in a Go language. Measuring an execution time.
+
+```txt
+    *** Advent of Code 2021 ***
+===================================
+d01:
+2021/12/10 18:09:58 Took 3.9µs
+2021/12/10 18:09:58 01: 1393
+2021/12/10 18:09:58 Took 8µs
+2021/12/10 18:09:58 02: 1359
+```
 
 ## Run
 ```sh

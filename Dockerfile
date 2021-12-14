@@ -45,4 +45,7 @@ RUN go install d12/d12.go
 COPY d13/ d13/
 RUN go install d13/d13.go
 
+COPY d14/ d14/
+RUN go install d14/d14.go
+
 CMD ["./start.sh"]

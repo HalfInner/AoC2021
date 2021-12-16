@@ -98,8 +98,28 @@ func (br *BitReader) read_type() int {
 }
 
 func (br *BitReader) read_value() int {
+	val := 0
+	for {
+		skip := br.read_hex(1) == 0
+		val += br.read_hex(4)
+		if skip {
+			break
+		}
+		val <<= 4
+	}
+	br.align()
+	return val
+}
 
-	return br.read_hex(3)
+func (br *BitReader) align() {
+	bit_idx := br.bit_cnt % 4
+	if bit_idx > 0 {
+		br.bit_cnt += 4 - bit_idx
+	}
+}
+
+func (br *BitReader) nothing_to_read() bool {
+	return br.bit_len == br.bit_cnt
 }
 
 func d16_1(data Data) int {
@@ -108,10 +128,8 @@ func d16_1(data Data) int {
 	br.init(data.transmission)
 	br.read_version()
 	type_ := br.read_type()
-	log.Panicf("type=%d", type_)
 	literal_value_id := 4
 	if type_ == literal_value_id {
-		log.Printf("reading value")
 		return br.read_value()
 	}
 

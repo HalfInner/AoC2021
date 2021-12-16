@@ -4,6 +4,7 @@ import (
 	"AoC2021/aoc_fun"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"strings"
 )
@@ -37,7 +38,7 @@ func read_data() Data {
 }
 
 type BitReaderStack struct {
-	bit_cnt, bit_len int
+	bit_cnt, bit_len, bit_cnt_tmp int
 }
 
 type Stack struct {
@@ -76,9 +77,10 @@ func (s *Stack) Top() BitReaderStack {
 }
 
 type BitReader struct {
-	hex_transmission           string
-	bit_cnt, bit_len, vers_cnt int
-	stack                      Stack
+	hex_transmission                        string
+	bit_cnt, bit_len, vers_cnt, bit_cnt_tmp int
+	stack                                   Stack
+	debug_mode                              bool
 }
 
 func (br *BitReader) init(hex_transmission string) {
@@ -86,17 +88,21 @@ func (br *BitReader) init(hex_transmission string) {
 	br.bit_cnt = 0
 	br.bit_len = len(br.hex_transmission) * 4
 	br.vers_cnt = 0
-	br.stack.Push(BitReaderStack{br.bit_cnt, br.bit_len})
+	br.bit_cnt_tmp = 0
+	br.debug_mode = false
+	br.stack.Push(BitReaderStack{br.bit_cnt, br.bit_len, br.bit_cnt_tmp})
+}
+
+func (br *BitReader) Printf(format string, a ...interface{}) {
+	if br.debug_mode {
+		log.Printf(format, a...)
+	}
 }
 
 func (br *BitReader) read_hex(bits int) int {
-	if br.bit_cnt+bits >= br.bit_len {
-		br.bit_cnt += bits
-		return 0
-	}
 	val := 0
 	read_bits := 0
-	for read_bits < bits {
+	for read_bits < bits && br.bit_cnt < br.bit_len {
 		val <<= 4
 		hex_idx, bit_idx := br.bit_cnt/4, br.bit_cnt%4
 		var b byte
@@ -114,10 +120,10 @@ func (br *BitReader) read_hex(bits int) int {
 
 		b_n := byte(0)
 		left_bits_in_hex := 4 - bit_idx
-		for ; left_bits_in_hex > 0 && read_bits < bits; left_bits_in_hex-- {
+		for ; left_bits_in_hex > 0 && read_bits < bits && br.bit_cnt < br.bit_len; left_bits_in_hex-- {
 			b_n += b & (1 << (left_bits_in_hex - 1))
 			read_bits++
-			br.bit_cnt++
+			br.advance_cnt(1)
 		}
 
 		val += int(b_n)
@@ -150,83 +156,35 @@ func (br *BitReader) read_value() int {
 		}
 		val <<= 4
 	}
-	// br.align()
 	return val
-}
-
-func (br *BitReader) align() {
-	bit_idx := br.bit_cnt % 4
-	if bit_idx > 0 {
-		br.bit_cnt += 4 - bit_idx
-	}
 }
 
 func (br *BitReader) nothing_to_read() bool {
 	return br.bit_cnt >= br.bit_len
 }
 
-func (br *BitReader) call_bit_reader_def() {
-	br.call_bit_reader(br.bit_cnt)
-}
-
 func (br *BitReader) call_bit_reader(len int) {
-	br.stack.Push(BitReaderStack{br.bit_cnt, br.bit_len})
+	br.stack.Push(BitReaderStack{br.bit_cnt, br.bit_len, br.bit_cnt_tmp})
 	br.bit_len = br.bit_cnt + len
+	br.bit_cnt_tmp = 0
 }
 
 func (br *BitReader) return_bit_reader() int {
-	cnt := br.bit_cnt
-	br.bit_cnt, br.bit_len = br.stack.Top().bit_cnt, br.stack.Top().bit_len
+	cnt := br.bit_cnt_tmp
+	br.bit_cnt, br.bit_len, br.bit_cnt_tmp = br.stack.Top().bit_cnt, br.stack.Top().bit_len, br.stack.Top().bit_cnt_tmp
 	br.stack.Pop()
+	br.Printf("Return cnt=%d", cnt)
 	return cnt
 }
 
-func (br *BitReader) read_operator() {
+func (br *BitReader) read_operator_sick() {
 	switch br.read_hex(1) {
-	case 0: // sum
-		log.Print("Operator bits")
-		length_in_bits := br.read_hex(15)
-		br.call_bit_reader(length_in_bits)
+	case 0:
+		br.Printf("Operator bits")
+		br.read_hex(15)
 		br.read_packets()
-		br.bit_cnt = br.return_bit_reader()
 	case 1:
-		log.Print("Operator packets")
-		number_of_packets := br.read_hex(11)
-		for packet := 0; packet < number_of_packets; packet++ {
-			br.read_packets()
-		}
-	case 2:
-		log.Print("Operator packets")
-		number_of_packets := br.read_hex(11)
-		for packet := 0; packet < number_of_packets; packet++ {
-			br.read_packets()
-		}
-	case 3:
-		log.Print("Operator packets")
-		number_of_packets := br.read_hex(11)
-		for packet := 0; packet < number_of_packets; packet++ {
-			br.read_packets()
-		}
-	case 4:
-		log.Print("Operator packets")
-		number_of_packets := br.read_hex(11)
-		for packet := 0; packet < number_of_packets; packet++ {
-			br.read_packets()
-		}
-	case 5:
-		log.Print("Operator packets")
-		number_of_packets := br.read_hex(11)
-		for packet := 0; packet < number_of_packets; packet++ {
-			br.read_packets()
-		}
-	case 6:
-		log.Print("Operator packets")
-		number_of_packets := br.read_hex(11)
-		for packet := 0; packet < number_of_packets; packet++ {
-			br.read_packets()
-		}
-	case 7:
-		log.Print("Operator packets")
+		br.Printf("Operator packets")
 		number_of_packets := br.read_hex(11)
 		for packet := 0; packet < number_of_packets; packet++ {
 			br.read_packets()
@@ -234,23 +192,118 @@ func (br *BitReader) read_operator() {
 	}
 }
 
-func (br *BitReader) read_packets() {
+func (br *BitReader) advance_cnt(cnt int) {
+	br.bit_cnt += cnt
+	br.bit_cnt_tmp += cnt
+}
+
+func (br *BitReader) read_operator(packet_type int) (ret int) {
+	number_of_bits := -1
+	defer func() {
+		if number_of_bits >= 0 {
+			br.advance_cnt(br.return_bit_reader())
+		}
+	}()
+	number_of_packets := math.MaxInt
+	switch br.read_hex(1) {
+	case 0:
+		number_of_bits = br.read_hex(15)
+		br.Printf("Bit mode b=%d", number_of_bits)
+		br.call_bit_reader(number_of_bits)
+	case 1:
+		number_of_packets = br.read_hex(11)
+		br.Printf("Packet Mode p=%d", number_of_packets)
+	}
+
+	switch packet_type {
+	case 0: // sum
+		br.Printf("Operator sum")
+		sum := 0
+		for !br.nothing_to_read() && number_of_packets > 0 {
+			number_of_packets--
+			sum += br.read_packets()
+		}
+		return sum
+	case 1:
+		br.Printf("Operator product")
+		number_of_packets--
+		mul := br.read_packets()
+		for !br.nothing_to_read() && number_of_packets > 0 {
+			number_of_packets--
+			mul *= br.read_packets()
+		}
+		return mul
+	case 2:
+		br.Printf("Operator minimum")
+
+		min := math.MaxInt
+		for !br.nothing_to_read() && number_of_packets > 0 {
+			number_of_packets--
+			val := br.read_packets()
+			if val < min {
+				min = val
+			}
+		}
+		return min
+	case 3:
+		max := math.MinInt
+		for !br.nothing_to_read() && number_of_packets > 0 {
+			number_of_packets--
+			val := br.read_packets()
+			if val > max {
+				max = val
+			}
+		}
+		return max
+	case 5:
+		br.Printf("Operator greater than")
+		val1 := br.read_packets()
+		val2 := br.read_packets()
+		if val1 > val2 {
+			return 1
+		}
+		return 0
+	case 6:
+		br.Printf("Operator less then")
+		val1 := br.read_packets()
+		val2 := br.read_packets()
+		if val1 < val2 {
+			return 1
+		}
+		return 0
+	case 7:
+		br.Printf("Operator equal to")
+		val1 := br.read_packets()
+		val2 := br.read_packets()
+		if val1 == val2 {
+			return 1
+		}
+		return 0
+	default:
+		log.Panic("Operator not recognised")
+	}
+	return ret
+}
+
+func (br *BitReader) read_packets() int {
 	for !br.nothing_to_read() {
 		ver := br.read_version()
-		log.Printf("Read Version: %d", ver)
+		br.Printf("Read Version: %d", ver)
 		packet_type := br.read_type()
 		switch packet_type {
-		case 4: // value
+		case 4:
 			val := br.read_value()
-			log.Printf("Read Value: %d", val)
-		default: // operator
-			br.read_operator()
+			br.Printf("Read Value: %d", val)
+			return val
+		default:
+			return br.read_operator(packet_type)
 		}
 	}
+	return 0
 }
 
-func (br *BitReader) start() {
-	br.read_packets()
+func (br *BitReader) start() int {
+	return br.read_packets()
 }
 
 func d16_1(data Data) int {
@@ -263,7 +316,9 @@ func d16_1(data Data) int {
 
 func d16_2(data Data) int {
 	defer aoc_fun.Track(aoc_fun.Runningtime())
-	return -1
+	var br BitReader
+	br.init(data.transmission)
+	return br.start()
 }
 
 func main() {

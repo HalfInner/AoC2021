@@ -48,6 +48,9 @@ RUN go install d13/d13.go
 COPY d14/ d14/
 RUN go install d14/d14.go
 
+COPY d15/ d15/
+RUN go install d15/d15.go
+
 COPY d16/ d16/
 RUN go install d16/d16.go
 
